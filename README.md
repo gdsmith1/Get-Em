@@ -31,11 +31,11 @@ The goal of this project is to make an Android-only game similar to Niantic’s 
 
 Login Page:
 
-![login](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image1.png)
+![login](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image1.png)
 
 Home Page:
 
-![home](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image7.png)
+![home](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image7.png)
 
 1. Creatures to capture
 2. Player Icon
@@ -46,14 +46,14 @@ Home Page:
 
 Inventory Page
 
-![inventory](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image2.png)
+![inventory](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image2.png)
 
 1. Creature descriptions
 2. Back button
 
 Settings Page
 
-![settings](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image3.png)
+![settings](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image3.png)
 
 1. Back button
 2. Difficulty setting
@@ -63,14 +63,14 @@ Settings Page
 
 Community Page
 
-![community](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image4.png)
+![community](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image4.png)
 
 1. Back button
 2. Player List with quick description
 
 Activity Page
 
-![activity](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image5.png)
+![activity](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image5.png)
 
 1. Back button
 2. Ball to throw at creature
@@ -79,7 +79,7 @@ Activity Page
 
 **Diagram Screen Relationships**
 
-![page map](https://github.com/gdsmith1/get-em/raw/main/projectdescription/image6.png)
+![map](https://github.com/gdsmith1/Get-Em/blob/main/projectdescription/images/image6.png)
 
 
 **Project Deliverables**
