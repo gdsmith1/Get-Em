@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_core/firebase_core.dart";
 import 'firebase_options.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: 'Simple Stateless Form'),
+      home: MyHomePage(title: 'Inventory'),
     );
   }
 }
@@ -38,7 +38,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late var _textController;
   late Future<List<Map<String, dynamic>>> futureData;
-  late Future<String> _displayString;
 
   @override
   void dispose() {
@@ -46,30 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Future<void> _printText() async {
-    String displayString = await widget.storage.readEntry();
-    displayString = _textController.text;
-    if (kDebugMode) {
-      print("Texfield text: ${_textController.text}");
-    }
-    await widget.storage.writeEntry(displayString);
-    setState(() {
-      _displayString = widget.storage.readEntry();
-    });
-  }
-
-  Future<void> _newCatch() async {
+  Future<void> _newCatch(String type) async {
     //uses writeCatch()
-    String type = await widget.storage.readEntry();
-    type = _textController.text;
     if (kDebugMode) {
       print("Texfield text: ${_textController.text}");
     }
     //randomly generate variables here
     await widget.storage.writeCatch(type, 3, 5);
-    setState(() {
-      _displayString = widget.storage.readEntry();
-    });
+    setState(() {});
   }
 
   @override
@@ -77,7 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     futureData = fetchInventory();
     _textController = TextEditingController();
-    _displayString = widget.storage.readEntry();
   }
 
   Future<List<Map<String, dynamic>>> fetchInventory() async {
@@ -93,7 +75,11 @@ class _MyHomePageState extends State<MyHomePage> {
           if (element.id == "usersettings") {
             return;
           }
-          //data.add(element.data());
+          data.add(element.data() as Map<String,
+              dynamic>); //this will break the app if any file besides usersettings does not have the same format
+          if (kDebugMode) {
+            print(element.data());
+          }
         });
         return data;
       }
@@ -119,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: DataTable(
-                columns: [
+                columns: const [
                   DataColumn(label: Text("Type")),
                   DataColumn(label: Text("Weight")),
                   DataColumn(label: Text("Height")),
@@ -136,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         },
       ),
     );
@@ -187,58 +173,5 @@ class FireStorage {
       }
     }
     return false;
-  }
-
-  Future<bool> writeEntry(String displayString) async {
-    try {
-      if (!isInitialized) {
-        await initializeDefault();
-      }
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      firestore.collection("testuser1").doc("charizard").set({
-        "type": displayString,
-      }).then((value) {
-        if (kDebugMode) {
-          print("writetoFirebase: $displayString");
-        }
-        return true;
-      }).catchError((error) {
-        if (kDebugMode) {
-          print("writetoFirebase: $error");
-        }
-        return false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e.toString());
-      }
-    }
-    return false;
-  }
-
-  Future<String> readEntry() async {
-    try {
-      if (!isInitialized) {
-        await initializeDefault();
-      }
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      DocumentSnapshot ds =
-          await firestore.collection("testuser1").doc("charizard").get();
-      if (ds.exists && ds.data() != null) {
-        Map<String, dynamic> data = (ds.data() as Map<String, dynamic>);
-        if (data.containsKey("type")) {
-          return data["type"];
-        }
-      }
-      bool writeSuccess = await writeEntry("");
-      if (writeSuccess) {
-        return "";
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(e.toString());
-      }
-    }
-    return "NULL";
   }
 }
