@@ -37,6 +37,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late var _textController;
+  late Future<List<Map<String, dynamic>>> futureData;
   late Future<String> _displayString;
 
   @override
@@ -74,8 +75,34 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    futureData = fetchInventory();
     _textController = TextEditingController();
     _displayString = widget.storage.readEntry();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchInventory() async {
+    try {
+      if (!widget.storage.isInitialized) {
+        await widget.storage.initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      QuerySnapshot qs = await firestore.collection("testuser1").get();
+      if (qs.docs.isNotEmpty) {
+        List<Map<String, dynamic>> data = [];
+        qs.docs.forEach((element) {
+          if (element.id == "usersettings") {
+            return;
+          }
+          //data.add(element.data());
+        });
+        return data;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return [];
   }
 
   @override
@@ -85,35 +112,32 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: _textController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Enter your username',
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: futureData,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text("Type")),
+                  DataColumn(label: Text("Weight")),
+                  DataColumn(label: Text("Height")),
+                ],
+                rows: snapshot.data!
+                    .map((data) => DataRow(cells: [
+                          DataCell(Text(data["type"])),
+                          DataCell(Text(data["weight"].toString())),
+                          DataCell(Text(data["height"].toString())),
+                        ]))
+                    .toList(),
               ),
-            ),
-            ElevatedButton(onPressed: _newCatch, child: const Text("Submit")),
-            FutureBuilder<String>(
-              future: _displayString,
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.hasData) {
-                  return Text(
-                    '${snapshot.data}',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("Error: ${snapshot.error}");
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            ),
-          ],
-        ),
+            );
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+          return CircularProgressIndicator();
+        },
       ),
     );
   }
