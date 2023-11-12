@@ -57,6 +57,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _newCatch() async {
+    //uses writeCatch()
+    String type = await widget.storage.readEntry();
+    type = _textController.text;
+    if (kDebugMode) {
+      print("Texfield text: ${_textController.text}");
+    }
+    //randomly generate variables here
+    await widget.storage.writeCatch(type, 3, 5);
+    setState(() {
+      _displayString = widget.storage.readEntry();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 labelText: 'Enter your username',
               ),
             ),
-            ElevatedButton(onPressed: _printText, child: const Text("Submit")),
+            ElevatedButton(onPressed: _newCatch, child: const Text("Submit")),
             FutureBuilder<String>(
               future: _displayString,
               builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -121,6 +135,35 @@ class FireStorage {
   }
 
   bool get isInitialized => _initialized;
+
+  Future<bool> writeCatch(String type, int weight, int height) async {
+    try {
+      if (!isInitialized) {
+        await initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore.collection("testuser1").doc().set({
+        "type": type,
+        "weight": weight,
+        "height": height,
+      }).then((value) {
+        if (kDebugMode) {
+          //print("writetoFirebase: $.id");
+        }
+        return true;
+      }).catchError((error) {
+        if (kDebugMode) {
+          print("writetoFirebase: $error");
+        }
+        return false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return false;
+  }
 
   Future<bool> writeEntry(String displayString) async {
     try {
