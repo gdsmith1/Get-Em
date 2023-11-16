@@ -14,19 +14,17 @@ class SocialRoute extends StatelessWidget {
         title: const Text('Social'),
       ),
       body: Center(),
-       
-
-    bottomNavigationBar: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-  Navigator.popAndPushNamed(context, '/game');        },
+      bottomNavigationBar: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ], // This trailing comma makes auto-formatting nicer for build methods.
       ),
-      
-    ], // This trailing comma makes auto-formatting nicer for build methods.
-  ),
     );
   }
 }

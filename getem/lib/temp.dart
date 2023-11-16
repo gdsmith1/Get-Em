@@ -1,46 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:getem/main.dart';
 import 'package:flutter/foundation.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:firebase_core/firebase_core.dart";
+import 'firebase_options.dart';
 
-class InventoryRoute extends StatelessWidget {
-  const InventoryRoute({super.key});
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Inventory',
+      title: 'Firebase demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: InventoryPage(title: 'Inventory'),
+      home: MyHomePage(title: 'Inventory'),
     );
   }
 }
 
-class InventoryPage extends StatefulWidget {
-  InventoryPage({super.key, required this.title});
+class MyHomePage extends StatefulWidget {
+  MyHomePage({super.key, required this.title});
 
   final String title;
   final FireStorage storage = FireStorage();
 
   @override
-  State<InventoryPage> createState() => _InventoryPageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class _MyHomePageState extends State<MyHomePage> {
+  late var _textController;
   late Future<List<Map<String, dynamic>>> futureData;
 
   @override
   void dispose() {
+    _textController.dispose();
     super.dispose();
+  }
+
+  Future<void> _newCatch(String type) async {
+    //uses writeCatch()
+    if (kDebugMode) {
+      print("Texfield text: ${_textController.text}");
+    }
+    //randomly generate variables here
+    await widget.storage.writeCatch(type, 3, 5);
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     futureData = fetchInventory();
+    _textController = TextEditingController();
   }
 
   Future<List<Map<String, dynamic>>> fetchInventory() async {
@@ -49,9 +68,7 @@ class _InventoryPageState extends State<InventoryPage> {
         await widget.storage.initializeDefault();
       }
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-      QuerySnapshot qs = await firestore
-          .collection("testuser1")
-          .get(); //TODO: replace testuser1 with id from login
+      QuerySnapshot qs = await firestore.collection("testuser1").get();
       if (qs.docs.isNotEmpty) {
         List<Map<String, dynamic>> data = [];
         qs.docs.forEach((element) {
@@ -108,18 +125,53 @@ class _InventoryPageState extends State<InventoryPage> {
           return const CircularProgressIndicator();
         },
       ),
-      //this is causing some issues...
-      /*bottomNavigationBar: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),*/
     );
+  }
+}
+
+class FireStorage {
+  bool _initialized = false;
+
+  FireStorage();
+
+  Future<void> initializeDefault() async {
+    FirebaseApp app = await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    _initialized = true;
+    if (kDebugMode) {
+      print("Initialized default app $app");
+    }
+  }
+
+  bool get isInitialized => _initialized;
+
+  Future<bool> writeCatch(String type, int weight, int height) async {
+    try {
+      if (!isInitialized) {
+        await initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore.collection("testuser1").doc().set({
+        "type": type,
+        "weight": weight,
+        "height": height,
+      }).then((value) {
+        if (kDebugMode) {
+          //print("writetoFirebase: $.id");
+        }
+        return true;
+      }).catchError((error) {
+        if (kDebugMode) {
+          print("writetoFirebase: $error");
+        }
+        return false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return false;
   }
 }

@@ -23,6 +23,6 @@ class FirstRoute extends StatelessWidget {
   }
 }
 
-Widget get getfirtroute{
-return FirstRoute();
+Widget get getfirstroute {
+  return FirstRoute();
 }

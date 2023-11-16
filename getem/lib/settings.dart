@@ -4,7 +4,6 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'login.dart';
 import 'game.dart';
 
-
 class SettingsRoute extends StatelessWidget {
   const SettingsRoute({super.key});
 
@@ -15,19 +14,17 @@ class SettingsRoute extends StatelessWidget {
         title: const Text('Settings'),
       ),
       body: Center(),
- 
-    bottomNavigationBar: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-        Navigator.popAndPushNamed(context, '/game');        },
+      bottomNavigationBar: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ], // This trailing comma makes auto-formatting nicer for build methods.
       ),
-      
-    ], // This trailing comma makes auto-formatting nicer for build methods.
-  ),
-      
     );
   }
 }
