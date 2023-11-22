@@ -10,10 +10,10 @@ class InventoryRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Inventory',
-      theme: ThemeData(
+      /*theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
-      ),
+      ),*/
       home: InventoryPage(title: 'Inventory'),
     );
   }
@@ -78,7 +78,6 @@ class _InventoryPageState extends State<InventoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
