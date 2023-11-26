@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:getem/game.dart';
 import 'package:getem/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,13 +9,11 @@ class InventoryRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Inventory',
-      /*theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),*/
-      home: InventoryPage(title: 'Inventory'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Inventory"),
+      ),
+      body: InventoryPage(title: "Inventory"),
     );
   }
 }
@@ -77,9 +76,6 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: futureData,
         builder: (context, snapshot) {
@@ -107,18 +103,6 @@ class _InventoryPageState extends State<InventoryPage> {
           return const CircularProgressIndicator();
         },
       ),
-      //this is causing some issues...
-      /*bottomNavigationBar: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),*/
     );
   }
 }
