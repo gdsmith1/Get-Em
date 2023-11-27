@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:getem/game.dart';
 import 'package:getem/main.dart';
+import 'package:getem/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class InventoryRoute extends StatelessWidget {
   const InventoryRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
+    print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
     return Scaffold(
       appBar: AppBar(
         title: Text("Inventory"),
@@ -30,6 +33,7 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   late Future<List<Map<String, dynamic>>> futureData;
+  String id = "";
 
   @override
   void dispose() {
@@ -39,18 +43,24 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   void initState() {
     super.initState();
-    futureData = fetchInventory();
   }
 
-  Future<List<Map<String, dynamic>>> fetchInventory() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    id = ModalRoute.of(context)!.settings.arguments as String;
+    futureData = fetchInventory(id);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchInventory(String id) async {
     try {
       if (!widget.storage.isInitialized) {
         await widget.storage.initializeDefault();
       }
+
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-      QuerySnapshot qs = await firestore
-          .collection("testuser1")
-          .get(); //TODO: replace testuser1 with id from login
+
+      QuerySnapshot qs = await firestore.collection(id).get();
       if (qs.docs.isNotEmpty) {
         List<Map<String, dynamic>> data = [];
         qs.docs.forEach((element) {
@@ -64,6 +74,8 @@ class _InventoryPageState extends State<InventoryPage> {
           }
         });
         return data;
+      } else {
+        await createCollection(id);
       }
     } catch (e) {
       if (kDebugMode) {

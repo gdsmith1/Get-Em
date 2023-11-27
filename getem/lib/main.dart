@@ -125,3 +125,14 @@ class FireStorage {
     return "NULL";
   }
 }
+
+Future<void> createCollection(String id) async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  // Specify the collection and document
+  DocumentReference docRef = firestore.collection(id).doc('usersettings');
+  // Set the data of the document
+  await docRef.set({
+    'difficulty': 2,
+  });
+}

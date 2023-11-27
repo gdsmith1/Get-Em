@@ -94,9 +94,6 @@ class _loginPageState extends State<loginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +123,11 @@ class _loginPageState extends State<loginPage> {
       ));
       widgets.add(ElevatedButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/game');
+            String id = _currentUser!.id;
+            if (kDebugMode) {
+              print("Logged in... Google User id: $id");
+            }
+            Navigator.pushNamed(context, '/game', arguments: id);
           },
           child: Text("Start Playing!")));
       widgets.add(

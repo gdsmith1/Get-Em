@@ -47,7 +47,9 @@ class _GamePageState extends State<GamePage> {
           IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () {
-              Navigator.pushNamed(context, '/inventory');
+              Navigator.pushNamed(context, '/inventory',
+                  arguments:
+                      ModalRoute.of(context)!.settings.arguments as String);
             },
             iconSize: 40,
           ),
