@@ -1,108 +1,138 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:getem/game.dart';
+import 'login.dart';
+import 'inventory.dart';
+import 'settings.dart';
+import 'social.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:firebase_core/firebase_core.dart";
+import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    title: 'Get-em routing',
+    initialRoute: '/',
+    routes: {
+      '/': (context) => FirstRoute(), //login
+
+      '/game': (context) => GameRoute(), //game
+      '/inventory': (context) => InventoryRoute(),
+      '/settings': (context) => SettingsRoute(),
+      '/socials': (context) => SocialRoute(),
+    },
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FireStorage {
+  bool _initialized = false;
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 190, 0, 0)),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+  FireStorage();
+
+  Future<void> initializeDefault() async {
+    FirebaseApp app = await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
+    _initialized = true;
+    if (kDebugMode) {
+      print("Initialized default app $app");
+    }
+  }
+
+  bool get isInitialized => _initialized;
+
+  Future<bool> writeCatch(String type, int weight, int height) async {
+    try {
+      if (!isInitialized) {
+        await initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore.collection("testuser1").doc().set({
+        "type": type,
+        "weight": weight,
+        "height": height,
+      }).then((value) {
+        if (kDebugMode) {
+          //print("writetoFirebase: $.id");
+        }
+        return true;
+      }).catchError((error) {
+        if (kDebugMode) {
+          print("writetoFirebase: $error");
+        }
+        return false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return false;
+  }
+
+  //writes to a single entry in the database
+  Future<bool> writeEntry(String displayString) async {
+    try {
+      if (!isInitialized) {
+        await initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore.collection("testuser1").doc("charizard").set({
+        "type": displayString,
+      }).then((value) {
+        if (kDebugMode) {
+          print("writetoFirebase: $displayString");
+        }
+        return true;
+      }).catchError((error) {
+        if (kDebugMode) {
+          print("writetoFirebase: $error");
+        }
+        return false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return false;
+  }
+
+  //reads a single entry from the database
+  Future<String> readEntry() async {
+    try {
+      if (!isInitialized) {
+        await initializeDefault();
+      }
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      DocumentSnapshot ds =
+          await firestore.collection("testuser1").doc("charizard").get();
+      if (ds.exists && ds.data() != null) {
+        Map<String, dynamic> data = (ds.data() as Map<String, dynamic>);
+        if (data.containsKey("type")) {
+          return data["type"];
+        }
+      }
+      bool writeSuccess = await writeEntry("");
+      if (writeSuccess) {
+        return "";
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return "NULL";
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+Future<void> createCollection(String id) async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+  // Specify the collection and document
+  DocumentReference docRef = firestore.collection(id).doc('usersettings');
+  // Set the data of the document
+  await docRef.set({
+    'difficulty': 2,
+  });
 }
