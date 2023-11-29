@@ -127,6 +127,7 @@ class FireStorage {
 }
 
 Future<void> createCollection(String id) async {
+  //use this if a user doesnt exist or has no data
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Specify the collection and document

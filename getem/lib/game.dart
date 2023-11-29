@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'main.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'inventory.dart';
@@ -10,6 +11,9 @@ class GameRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Get Em!"),
@@ -56,7 +60,9 @@ class _GamePageState extends State<GamePage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.pushNamed(context, '/settings');
+              Navigator.pushNamed(context, '/settings',
+                  arguments:
+                      ModalRoute.of(context)!.settings.arguments as String);
             },
             iconSize: 40,
           )
