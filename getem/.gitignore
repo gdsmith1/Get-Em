@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 android/app/src/main/AndroidManifest.xml
+
 /assets
 
 # Symbolication related
