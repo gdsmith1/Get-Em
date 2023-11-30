@@ -96,13 +96,19 @@ class _SettingsPageState extends State<SettingsPage> {
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
-                            //TODO: add difficulty editing
+                            changeDifficulty(id, -1);
+                            setState(() {
+                              futureDif = fetchDifficulty(id);
+                            });
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
-                            //TODO: add difficulty editing
+                            changeDifficulty(id, 1);
+                            setState(() {
+                              futureDif = fetchDifficulty(id);
+                            });
                           },
                         ),
                       ],
@@ -130,5 +136,19 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
+  }
+}
+
+void changeDifficulty(String userId, int increment) {
+  if (increment == 1) {
+    FirebaseFirestore.instance
+        .collection(userId)
+        .doc("usersettings")
+        .update({'difficulty': FieldValue.increment(1)});
+  } else if (increment == -1) {
+    FirebaseFirestore.instance
+        .collection(userId)
+        .doc("usersettings")
+        .update({'difficulty': FieldValue.increment(-1)});
   }
 }

@@ -134,6 +134,6 @@ Future<void> createCollection(String id) async {
   DocumentReference docRef = firestore.collection(id).doc('usersettings');
   // Set the data of the document
   await docRef.set({
-    'difficulty': 2,
+    'difficulty': 1,
   });
 }
