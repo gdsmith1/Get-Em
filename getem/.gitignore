@@ -31,9 +31,6 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-android/app/src/main/AndroidManifest.xml
-
-/assets
 
 # Symbolication related
 app.*.symbols
