@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 class GameRoute extends StatelessWidget {
   const GameRoute({Key? key});
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
+    }
     return Scaffold(
       body: GamePage(title: "Get Em!"),
     );
@@ -142,7 +146,9 @@ class _GamePageState extends State<GamePage> {
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, '/settings');
+            Navigator.pushNamed(context, '/settings',
+                arguments:
+                    ModalRoute.of(context)!.settings.arguments as String);
           },
           iconSize: 40,
         ),

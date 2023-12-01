@@ -47,10 +47,10 @@ class loginPage extends StatefulWidget {
   final String title;
 
   @override
-  State<loginPage> createState() => _loginPageState();
+  State<loginPage> createState() => _LoginPageState();
 }
 
-class _loginPageState extends State<loginPage> {
+class _LoginPageState extends State<loginPage> {
   GoogleSignInAccount? _currentUser;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
