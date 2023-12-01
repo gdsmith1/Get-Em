@@ -83,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Center(
         child: ListView(
           children: [
-            ListTile(),
+            const ListTile(), //just for spacing
             FutureBuilder<Map<String, dynamic>>(
               future: futureDif,
               builder: (context, snapshot) {
@@ -96,7 +96,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
-                            changeDifficulty(id, -1);
+                            changeDifficulty(
+                                id, -1, snapshot.data!["difficulty"]);
                             setState(() {
                               futureDif = fetchDifficulty(id);
                             });
@@ -105,7 +106,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
-                            changeDifficulty(id, 1);
+                            changeDifficulty(
+                                id, 1, snapshot.data!["difficulty"]);
                             setState(() {
                               futureDif = fetchDifficulty(id);
                             });
@@ -122,6 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 return const CircularProgressIndicator();
               },
             ),
+            const ListTile(), //just for spacing
             ListTile(
               title: const Text('Log out of your Google account:'),
               trailing: ElevatedButton(
@@ -139,16 +142,11 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-void changeDifficulty(String userId, int increment) {
-  if (increment == 1) {
+void changeDifficulty(String userId, int increment, int currentDifficulty) {
+  if (currentDifficulty + increment > 1 && currentDifficulty + increment < 10) {
     FirebaseFirestore.instance
         .collection(userId)
         .doc("usersettings")
-        .update({'difficulty': FieldValue.increment(1)});
-  } else if (increment == -1) {
-    FirebaseFirestore.instance
-        .collection(userId)
-        .doc("usersettings")
-        .update({'difficulty': FieldValue.increment(-1)});
+        .update({'difficulty': FieldValue.increment(increment)});
   }
 }
