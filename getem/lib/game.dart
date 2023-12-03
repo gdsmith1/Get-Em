@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'dart:math';
 
 class GameRoute extends StatelessWidget {
   const GameRoute({Key? key});
@@ -13,6 +14,11 @@ class GameRoute extends StatelessWidget {
       print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
     }
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 166, 25, 25),
+        centerTitle: true,
+        title: Text("Get Em!"),
+      ),
       body: GamePage(title: "Get Em!"),
     );
   }
@@ -32,11 +38,23 @@ class _GamePageState extends State<GamePage> {
   CameraPosition? _cameraPosition;
   Location? _location;
   LocationData? _currentLocation;
+  List<Marker> _markers = [];
+  Completer<BitmapDescriptor>? _customMarkerCompleter;
+  // List<MarkerId> _markerIds = []; // Track marker ids
+  late Timer _timer;
 
   @override
   void initState() {
     super.initState();
     _init();
+    _startTimer();
+    _loadCustomMarker();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   _init() async {
@@ -48,6 +66,20 @@ class _GamePageState extends State<GamePage> {
     _initLocation();
   }
 
+  void _startTimer() {
+    const duration = Duration(seconds: 30);
+    _timer = Timer.periodic(duration, (timer) {
+      _removeAllMarkers();
+      _addRandomMarkers();
+    });
+  }
+
+  void _removeAllMarkers() {
+    setState(() {
+      _markers.clear();
+    });
+  }
+
   //function to listen when we move position
   _initLocation() {
     //use this to go to current location instead
@@ -56,6 +88,7 @@ class _GamePageState extends State<GamePage> {
     });
     _location?.onLocationChanged.listen((newLocation) {
       _currentLocation = newLocation;
+      _updateButtonVisibility();
       moveToPosition(LatLng(
           _currentLocation?.latitude ?? 0, _currentLocation?.longitude ?? 0));
     });
@@ -64,20 +97,19 @@ class _GamePageState extends State<GamePage> {
   moveToPosition(LatLng latLng) async {
     GoogleMapController mapController = await _googleMapController.future;
     mapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: latLng, zoom: 15)));
+        CameraPosition(target: latLng, zoom: 18)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: _buildBody(),
       bottomNavigationBar: _buildBottomNavigationBar(),
+      floatingActionButton: _isButtonVisible ? _buildActionButton() : null,
     );
   }
 
+  bool _isButtonVisible = false; // Initially hide the button
   Widget _buildBody() {
     return _getMap();
   }
@@ -88,10 +120,15 @@ class _GamePageState extends State<GamePage> {
         GoogleMap(
           initialCameraPosition: _cameraPosition!,
           mapType: MapType.normal,
+          markers: Set<Marker>.of(_markers),
           onMapCreated: (GoogleMapController controller) {
             if (!_googleMapController.isCompleted) {
               _googleMapController.complete(controller);
             }
+            _addRandomMarkers(); // Add random markers on map creation
+          },
+          onTap: (LatLng latLng) {
+            _removeMarker(); // Remove marker on map tap
           },
         ),
         Positioned.fill(
@@ -104,13 +141,59 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  void _addRandomMarkers() {
+    if (_currentLocation != null && _customMarkerCompleter != null) {
+      final int numberOfMarkers = 1;
+      final double quarterRadius = 0.0015; // Modify this radius as needed
+
+      Random random = Random();
+      _customMarkerCompleter!.future.then((customMarkerImage) {
+        for (int i = 0; i < numberOfMarkers; i++) {
+          double latOffset = (random.nextDouble() - 0.5) * quarterRadius * 2;
+          double lngOffset = (random.nextDouble() - 0.5) * quarterRadius * 2;
+
+          double newLat = _currentLocation!.latitude! + latOffset;
+          double newLng = _currentLocation!.longitude! + lngOffset;
+
+          LatLng randomLocation = LatLng(
+            newLat,
+            newLng,
+          );
+
+          _markers.add(
+            Marker(
+              markerId: MarkerId('marker_$i'),
+              position: randomLocation,
+              infoWindow: InfoWindow(title: 'Pokemon $i'),
+              icon: customMarkerImage, // Set the custom marker icon
+            ),
+          );
+        }
+        setState(() {});
+      });
+    }
+  }
+
+  void _loadCustomMarker() async {
+    final BitmapDescriptor customMarkerImage =
+        await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(size: Size(1, 1)), // Set the image size
+      'assets/icon.png', // Replace this with your image path
+    );
+
+    setState(() {
+      _customMarkerCompleter = Completer<BitmapDescriptor>()
+        ..complete(customMarkerImage);
+    });
+  }
+
   Widget _getMarker() {
     return Container(
       width: 60,
       height: 60,
       padding: EdgeInsets.all(2),
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color.fromARGB(255, 166, 25, 25),
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
@@ -154,5 +237,79 @@ class _GamePageState extends State<GamePage> {
         ),
       ],
     );
+  }
+
+  bool _showActionButton() {
+    return _markers.isNotEmpty;
+  }
+
+  Widget _buildActionButton() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: FloatingActionButton(
+        onPressed: () {
+          _removeMarker();
+          Navigator.pushNamed(context, '/socials');
+        },
+        backgroundColor: const Color.fromARGB(
+            255, 118, 22, 15), // Set the background color to maroon
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _removeMarker() {
+    if (_markers.isNotEmpty) {
+      int randomIndex = Random().nextInt(_markers.length); // Get a random index
+      setState(() {
+        _markers.removeAt(randomIndex); // Remove the marker at the random index
+      });
+    }
+  }
+
+  bool _shouldShowButton() {
+    if (_currentLocation != null) {
+      for (Marker marker in _markers) {
+        double distance = _calculateDistance(
+          _currentLocation!.latitude!,
+          _currentLocation!.longitude!,
+          marker.position.latitude,
+          marker.position.longitude,
+        );
+        if (distance <= 100) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  double _calculateDistance(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) {
+    const int earthRadius = 6371000; // in meters
+    double lat1 = startLatitude * pi / 180.0;
+    double lon1 = startLongitude * pi / 180.0;
+    double lat2 = endLatitude * pi / 180.0;
+    double lon2 = endLongitude * pi / 180.0;
+
+    double dLat = lat2 - lat1;
+    double dLon = lon2 - lon1;
+
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  void _updateButtonVisibility() {
+    bool showButton = _shouldShowButton();
+    setState(() {
+      _isButtonVisible = showButton;
+    });
   }
 }
