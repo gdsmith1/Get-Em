@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 class GameRoute extends StatelessWidget {
-  const GameRoute({Key? key});
+  const GameRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  Completer<GoogleMapController> _googleMapController = Completer();
+  final Completer<GoogleMapController> _googleMapController = Completer();
   CameraPosition? _cameraPosition;
   Location? _location;
   LocationData? _currentLocation;
@@ -41,7 +41,7 @@ class _GamePageState extends State<GamePage> {
 
   _init() async {
     _location = Location();
-    _cameraPosition = CameraPosition(
+    _cameraPosition = const CameraPosition(
         target: LatLng(
             0, 0), // this is just the example lat and lng for initializing
         zoom: 15);
@@ -108,11 +108,11 @@ class _GamePageState extends State<GamePage> {
     return Container(
       width: 60,
       height: 60,
-      padding: EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(100),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
                 color: Colors.grey,
                 offset: Offset(0, 3),

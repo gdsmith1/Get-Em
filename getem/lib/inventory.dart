@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:getem/game.dart';
 import 'package:getem/main.dart';
-import 'package:getem/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class InventoryRoute extends StatelessWidget {
   const InventoryRoute({super.key});
@@ -16,7 +13,7 @@ class InventoryRoute extends StatelessWidget {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text("Inventory"),
+        title: const Text("Inventory"),
       ),
       body: InventoryPage(title: "Inventory"),
     );

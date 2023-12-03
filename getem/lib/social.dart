@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getem/main.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'login.dart';
-import 'game.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class SocialRoute extends StatelessWidget {
   const SocialRoute({super.key});
@@ -17,18 +16,18 @@ class SocialRoute extends StatelessWidget {
     );
   }
 }
-/*
-class InventoryPage extends StatefulWidget {
-  InventoryPage({super.key, required this.title});
+
+class SocialPage extends StatefulWidget {
+  SocialPage({super.key, required this.title});
 
   final String title;
   final FireStorage storage = FireStorage();
 
   @override
-  State<InventoryPage> createState() => _InventoryPageState();
+  State<SocialPage> createState() => _SocialPageState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class _SocialPageState extends State<SocialPage> {
   late Future<List<Map<String, dynamic>>> futureData;
   String id = "";
 
@@ -45,11 +44,11 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    id = ModalRoute.of(context)!.settings.arguments as String;
-    futureData = fetchInventory(id);
+    //id = ModalRoute.of(context)!.settings.arguments as String;
+    futureData = fetchSocial();
   }
 
-  Future<List<Map<String, dynamic>>> fetchInventory(String id) async {
+  Future<List<Map<String, dynamic>>> fetchSocial() async {
     try {
       if (!widget.storage.isInitialized) {
         await widget.storage.initializeDefault();
@@ -115,4 +114,3 @@ class _InventoryPageState extends State<InventoryPage> {
     );
   }
 }
-*/

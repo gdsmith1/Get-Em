@@ -1,30 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'game.dart';
-import 'main.dart';
-
-/*class FirstRoute extends StatelessWidget {
-  const FirstRoute({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log in'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          child: const Text('Log in!'),
-          onPressed: () {
-            Navigator.pushNamed(context, '/game');
-          },
-        ),
-      ),
-    );
-  }
-}*/
 
 class FirstRoute extends StatelessWidget {
   const FirstRoute({super.key});
@@ -34,23 +10,23 @@ class FirstRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome to Get Em!"),
+        title: const Text("Welcome to Get Em!"),
       ),
-      body: loginPage(title: "Log in"),
+      body: const LoginPage(title: "Log in"),
     );
   }
 }
 
-class loginPage extends StatefulWidget {
-  const loginPage({super.key, required this.title});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<loginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<loginPage> {
+class _LoginPageState extends State<LoginPage> {
   GoogleSignInAccount? _currentUser;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -129,14 +105,14 @@ class _LoginPageState extends State<loginPage> {
             }
             Navigator.pushNamed(context, '/game', arguments: id);
           },
-          child: Text("Start Playing!")));
-      widgets.add(
-          ElevatedButton(onPressed: _handleSignOut, child: Text("Sign Out")));
+          child: const Text("Start Playing!")));
+      widgets.add(ElevatedButton(
+          onPressed: _handleSignOut, child: const Text("Sign Out")));
     }
     return widgets;
   }
 }
 
 Widget get getfirstroute {
-  return FirstRoute();
+  return const FirstRoute();
 }
