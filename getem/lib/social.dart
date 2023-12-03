@@ -12,7 +12,7 @@ class SocialRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Social'),
       ),
-      //body: SocialPage(title: "Social"),
+      body: SocialPage(title: "Social"),
     );
   }
 }
@@ -56,11 +56,11 @@ class _SocialPageState extends State<SocialPage> {
 
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      QuerySnapshot qs = await firestore.collection(id).get();
+      QuerySnapshot qs = await firestore.collection("allusers").get();
       if (qs.docs.isNotEmpty) {
         List<Map<String, dynamic>> data = [];
         qs.docs.forEach((element) {
-          if (element.id == "usersettings") {
+          if (element.id == "mostrecent") {
             return;
           }
           data.add(element.data() as Map<String,
