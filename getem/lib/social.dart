@@ -59,16 +59,36 @@ class _SocialPageState extends State<SocialPage> {
       QuerySnapshot qs = await firestore.collection("allusers").get();
       if (qs.docs.isNotEmpty) {
         List<Map<String, dynamic>> data = [];
-        qs.docs.forEach((element) {
-          if (element.id == "mostrecent") {
-            return;
-          }
-          data.add(element.data() as Map<String,
-              dynamic>); //this will break the app if any file besides usersettings does not have the same format
+
+        int mostRecentValue = 0;
+        // Get the most recent value
+        if (qs.docs.length > 9) {
           if (kDebugMode) {
-            print(element.data());
+            Map<String, dynamic> mostrecent =
+                qs.docs[10].data() as Map<String, dynamic>;
+            mostRecentValue = mostrecent['value'];
+          } //mostrecent
+        }
+        //read all from most recent to 0
+        for (int i = mostRecentValue; i >= 0; i--) {
+          if (qs.docs[i].id == "mostrecent") {
+            continue;
           }
-        });
+          data.add(qs.docs[i].data() as Map<String, dynamic>);
+          if (kDebugMode) {
+            print(qs.docs[i].data());
+          }
+        }
+        //read all from 9 to most recent
+        for (int i = 9; i > mostRecentValue; i--) {
+          if (qs.docs[i].id == "mostrecent") {
+            continue;
+          }
+          data.add(qs.docs[i].data() as Map<String, dynamic>);
+          if (kDebugMode) {
+            print(qs.docs[i].data());
+          }
+        }
         return data;
       } else {
         await createCollection(id);
