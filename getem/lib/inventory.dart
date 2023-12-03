@@ -11,7 +11,9 @@ class InventoryRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
+    if (kDebugMode) {
+      print('Arguments: ${ModalRoute.of(context)!.settings.arguments}');
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Inventory"),
