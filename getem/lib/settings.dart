@@ -12,6 +12,8 @@ class SettingsRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 166, 25, 25),
+        centerTitle: true,
         title: const Text('Settings'),
       ),
       body: SettingsPage(title: "Settings"),

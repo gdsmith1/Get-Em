@@ -11,6 +11,8 @@ class SocialRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 166, 25, 25),
+        centerTitle: true,
         title: const Text('Social'),
       ),
       //body: SocialPage(title: "Social"),
