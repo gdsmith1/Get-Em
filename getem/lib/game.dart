@@ -240,7 +240,7 @@ class _GamePageState extends State<GamePage> {
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, '/settings', arguments: id);
+            Navigator.pushNamed(context, '/catch', arguments: id);
           },
           iconSize: 40,
         ),
@@ -258,7 +258,7 @@ class _GamePageState extends State<GamePage> {
       child: FloatingActionButton(
         onPressed: () {
           _removeMarker();
-          Navigator.pushNamed(context, '/socials');
+          Navigator.pushNamed(context, '/catch');
         },
         backgroundColor: const Color.fromARGB(
             255, 118, 22, 15), // Set the background color to maroon

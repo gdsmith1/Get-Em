@@ -4,6 +4,7 @@ import 'login.dart';
 import 'inventory.dart';
 import 'settings.dart';
 import 'social.dart';
+import 'catch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_core/firebase_core.dart";
 import 'firebase_options.dart';
@@ -15,7 +16,7 @@ void main() {
     initialRoute: '/',
     routes: {
       '/': (context) => const FirstRoute(), //login
-
+      '/catch': (context) => const CatchRoute(),
       '/game': (context) => const GameRoute(), //game
       '/inventory': (context) => const InventoryRoute(),
       '/settings': (context) => const SettingsRoute(),
