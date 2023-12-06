@@ -100,10 +100,12 @@ class _LoginPageState extends State<LoginPage> {
       widgets.add(ElevatedButton(
           onPressed: () {
             String id = _currentUser!.id;
+            String profilePicture = _currentUser!.photoUrl!;
             if (kDebugMode) {
               print("Logged in... Google User id: $id");
             }
-            Navigator.pushNamed(context, '/game', arguments: id);
+            Navigator.pushNamed(context, '/game',
+                arguments: {'id': id, 'picture': profilePicture});
           },
           child: const Text("Start Playing!")));
       widgets.add(ElevatedButton(

@@ -105,6 +105,13 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _getMarker() {
+    Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    String? profilePictureUrl = arguments['picture'];
+    profilePictureUrl ??= 'assets/profile.png';
+    if (kDebugMode) {
+      print("Profile Picture URL: ");
+      print(profilePictureUrl);
+    }
     return Container(
       width: 60,
       height: 60,
@@ -119,11 +126,17 @@ class _GamePageState extends State<GamePage> {
                 spreadRadius: 4,
                 blurRadius: 6)
           ]),
-      child: ClipOval(child: Image.asset("assets/profile.jpg")),
+      child: ClipOval(
+        child: profilePictureUrl != null
+            ? Image.network(profilePictureUrl)
+            : Image.asset('assets/profile.png'),
+      ),
     );
   }
 
   Widget _buildBottomNavigationBar() {
+    Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    String id = arguments['id'];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -137,18 +150,14 @@ class _GamePageState extends State<GamePage> {
         IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            Navigator.pushNamed(context, '/inventory',
-                arguments:
-                    ModalRoute.of(context)!.settings.arguments as String);
+            Navigator.pushNamed(context, '/inventory', arguments: id);
           },
           iconSize: 40,
         ),
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, '/settings',
-                arguments:
-                    ModalRoute.of(context)!.settings.arguments as String);
+            Navigator.pushNamed(context, '/settings', arguments: id);
           },
           iconSize: 40,
         ),
