@@ -14,12 +14,12 @@ void main() {
     title: 'Get-em routing',
     initialRoute: '/',
     routes: {
-      '/': (context) => FirstRoute(), //login
+      '/': (context) => const FirstRoute(), //login
 
-      '/game': (context) => GameRoute(), //game
-      '/inventory': (context) => InventoryRoute(),
-      '/settings': (context) => SettingsRoute(),
-      '/socials': (context) => SocialRoute(),
+      '/game': (context) => const GameRoute(), //game
+      '/inventory': (context) => const InventoryRoute(),
+      '/settings': (context) => const SettingsRoute(),
+      '/socials': (context) => const SocialRoute(),
     },
   ));
 }
