@@ -4,22 +4,22 @@ import 'package:getem/login.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'main.dart';
+import 'package:intl/intl.dart';
 
 import 'dart:math';
 class Animal {
   final int id;
   final String type;
   final String img;
-  final int weight;
-  final int height;
+ 
 
   Animal({
     required this.id,
     required this.type,
     required this.img,
-    required this.weight,
-    required this.height,
   });
 }
 class CatchRoute extends StatelessWidget {
@@ -52,13 +52,26 @@ class _CatchPageState extends State<CatchPage> {
   String id = "";
   int lives = 3;
    FireStorage ?firevar;
+   bool didcatch = false;
  
 late Animal currentAnimal;
    List<Animal> animals = [
-    Animal(id: 0, type: 'Lion', weight: 200, height: 3,img:'assets/animals/lion.webp'),
-    Animal(id: 1, type: 'Elephant', weight: 5000, height: 10,img: 'assets/animals/elephant.jpg'),
-    // Add more animals as needed
+    Animal(id: 0, type: 'alliclaw',img:'assets/animals/alliclaw.webp'),
+     Animal(id: 1, type: 'wieneroam',img:'assets/animals/wieneroam.webp'),
+      Animal(id: 2, type: 'Aquapanda',img:'assets/animals/Aquapanda.webp'),
+      Animal(id: 3, type: 'Drakeon',img:'assets/animals/Drakeon.webp'),
+       Animal(id: 4, type: 'flananana',img:'assets/animals/flananana.webp'),
+         Animal(id: 5, type: 'galeodon',img:'assets/animals/galeodon.webp'),
+         Animal(id: 6, type: 'insectiant',img:'assets/animals/insectiant.webp'),
+           Animal(id: 7, type: 'moownicorn',img:'assets/animals/moownicorn.webp'),
+           Animal(id: 8, type: 'roaragon',img:'assets/animals/roaragon.webp'),
+           Animal(id: 9, type: 'samuronic',img:'assets/animals/samuronic.webp'),
+            Animal(id: 10, type: 'tyranomight',img:'assets/animals/tyranomight.webp'),
+            Animal(id: 11, type: 'venomorph',img:'assets/animals/venomorph.webp'),
+
   ];
+
+ String catchResult = "";
 
   @override
   void initState() {
@@ -74,7 +87,16 @@ late Animal currentAnimal;
     futureDif = fetchDifficulty(id);
   }
   
+Future <String?> getLocation() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+  List<Placemark> placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
+  //print('YOU LIVE IN: ${placemarks[0].locality}');
+   String ?location = placemarks[0].locality;
+   return location;
 
+}
   Future<Map<String, dynamic>> fetchDifficulty(String id) async {
     try {
       if (!widget.storage.isInitialized) {
@@ -102,14 +124,19 @@ late Animal currentAnimal;
     return {};
   }
   
-Future<bool> writeCatch(String type, int weight, int height) async {
+Future<bool> writeCatch(String type, String ?location, String date) async {
     try {
    
       FirebaseFirestore firestore = FirebaseFirestore.instance;
+      Random random = Random();
+      int xp  = random.nextInt(100);
+      
+      
       firestore.collection(id).doc().set({
         "type": type,
-        "weight": weight,
-        "height": height,
+        "xp": xp,
+        "Caught in":location,
+        "date": date
       }).then((value) {
         if (kDebugMode) {
           //print("writetoFirebase: $.id");
@@ -128,32 +155,65 @@ Future<bool> writeCatch(String type, int weight, int height) async {
     }
     return false;
   }
-  void tryToCatch(int playerDifficulty,Animal currentAnimal) {
-    if (lives > 0) {
+  String getDate(){
+     DateTime date = DateTime.now();
+     String formattedDate =DateFormat('yyyy-MM-dd').format(date);
+     return formattedDate;
+    
+  }
+  void tryToCatch(int playerDifficulty,Animal currentAnimal) async{
+    
+    if (lives > 0 && didcatch==false) {
       Random random = Random();
       int randomNumber = random.nextInt(21); // Generate a random number between 0 and 20
+        
+        
+      int result =  randomNumber+(playerDifficulty);
+      print(result);
 
-      int result = playerDifficulty - randomNumber;
-
-      if (result < 10) {
-        print("You didn't catch it! Try again.");
-
+      if (result > 15) {
+       // print("You didn't catch it! Try again.");
+        //print(DateTime.now());
         // Remove a red dot (life)
+        catchResult = "You didn't catch it! Try again.";
         lives--;
 
         // Update the UI
-        setState(() {});
+        //setState(() {});
       } else {
-        print("You caught it!");
-       writeCatch(currentAnimal.type, currentAnimal.weight, currentAnimal.height);///////////
+        //print("You caught it!");
+        
+        catchResult = "You caught the ${currentAnimal.type}!";
+        String? location = await getLocation();
+        String date= getDate();
+        //print(date);
+        //print(location);
+        didcatch=true;
+         lives=0;
+
+        
+
+       writeCatch(currentAnimal.type,location,date);///////////
+       //setState(() {});
+      
       }
-    } else {
+    } else if(lives==0 && didcatch==false) {
+              catchResult = "Game over! You've run out of lives.";
+             setState(() {});
       print("Game over! You've run out of lives.");
     }
+
+    else if(lives==0 && didcatch==true) {
+              catchResult = "You caught the ${currentAnimal.type}!";
+             setState(() {});
+      print("Game over! You've already won.");
+    }
+    
+  setState(() {});
   }
 
    @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
       title: Text('Catch'),
@@ -164,30 +224,38 @@ Future<bool> writeCatch(String type, int weight, int height) async {
         children: [
           Expanded(
             child: Container(
-              // Your existing content
+             
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 9), // Move content up by 7 pixels
           Column(
             children: [
-              // Display the initial animal information
-              Text("${currentAnimal.type}"),
+              Text(
+                catchResult, // Display catch result
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "Pokemon: ${currentAnimal.type}",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              // Removed SizedBox to move the text closer to the image
+
               Image.asset(
-                currentAnimal.img, // Replace with your actual image path
+                currentAnimal.img,
                 width: 250,
                 height: 500,
               ),
-              
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 9), // Move content up by 7 pixels
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               lives,
               (index) => Container(
-                width: 50,
-                height: 50,
+                width: 25,
+                height: 35,
                 margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -196,13 +264,12 @@ Future<bool> writeCatch(String type, int weight, int height) async {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 9), // Move content up by 7 pixels
           ElevatedButton(
             onPressed: () async {
-              // Fetch the difficulty and try to catch
               Map<String, dynamic> difficultyData = await fetchDifficulty(id);
               int playerDifficulty = difficultyData['difficulty'];
-              tryToCatch(playerDifficulty,currentAnimal);
+              tryToCatch(playerDifficulty, currentAnimal);
             },
             style: ElevatedButton.styleFrom(
               shape: CircleBorder(),
