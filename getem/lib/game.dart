@@ -240,7 +240,7 @@ class _GamePageState extends State<GamePage> {
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, '/catch', arguments: id);
+            Navigator.pushNamed(context, '/settings', arguments: id);
           },
           iconSize: 40,
         ),
@@ -253,12 +253,14 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _buildActionButton() {
+    Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    String id = arguments['id'];
     return Align(
       alignment: Alignment.bottomCenter,
       child: FloatingActionButton(
         onPressed: () {
           _removeMarker();
-          Navigator.pushNamed(context, '/catch');
+          Navigator.pushNamed(context, '/catch', arguments: id);
         },
         backgroundColor: const Color.fromARGB(
             255, 118, 22, 15), // Set the background color to maroon
