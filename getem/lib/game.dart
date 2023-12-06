@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:math';
 
 class GameRoute extends StatelessWidget {
-  const GameRoute({Key? key});
+  const GameRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  Completer<GoogleMapController> _googleMapController = Completer();
+  final Completer<GoogleMapController> _googleMapController = Completer();
   CameraPosition? _cameraPosition;
   Location? _location;
   LocationData? _currentLocation;
@@ -59,7 +59,7 @@ class _GamePageState extends State<GamePage> {
 
   _init() async {
     _location = Location();
-    _cameraPosition = CameraPosition(
+    _cameraPosition = const CameraPosition(
         target: LatLng(
             0, 0), // this is just the example lat and lng for initializing
         zoom: 15);
@@ -188,25 +188,38 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _getMarker() {
+    Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    String? profilePictureUrl = arguments['picture'];
+    profilePictureUrl ??= 'assets/profile.png';
+    if (kDebugMode) {
+      print("Profile Picture URL: ");
+      print(profilePictureUrl);
+    }
     return Container(
       width: 60,
       height: 60,
-      padding: EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
           color: const Color.fromARGB(255, 166, 25, 25),
           borderRadius: BorderRadius.circular(100),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
                 color: Colors.grey,
                 offset: Offset(0, 3),
                 spreadRadius: 4,
                 blurRadius: 6)
           ]),
-      child: ClipOval(child: Image.asset("assets/profile.jpg")),
+      child: ClipOval(
+        child: profilePictureUrl != null
+            ? Image.network(profilePictureUrl)
+            : Image.asset('assets/profile.png'),
+      ),
     );
   }
 
   Widget _buildBottomNavigationBar() {
+    Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    String id = arguments['id'];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -220,18 +233,14 @@ class _GamePageState extends State<GamePage> {
         IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            Navigator.pushNamed(context, '/inventory',
-                arguments:
-                    ModalRoute.of(context)!.settings.arguments as String);
+            Navigator.pushNamed(context, '/inventory', arguments: id);
           },
           iconSize: 40,
         ),
         IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () {
-            Navigator.pushNamed(context, '/settings',
-                arguments:
-                    ModalRoute.of(context)!.settings.arguments as String);
+            Navigator.pushNamed(context, '/settings', arguments: id);
           },
           iconSize: 40,
         ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:getem/main.dart';
-import 'package:getem/login.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
@@ -143,7 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 void changeDifficulty(String userId, int increment, int currentDifficulty) {
-  if (currentDifficulty + increment > 1 && currentDifficulty + increment < 10) {
+  if (currentDifficulty + increment > 0 && currentDifficulty + increment < 10) {
     FirebaseFirestore.instance
         .collection(userId)
         .doc("usersettings")

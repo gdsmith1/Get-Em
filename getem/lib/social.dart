@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getem/main.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'login.dart';
-import 'game.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class SocialRoute extends StatelessWidget {
   const SocialRoute({super.key});
@@ -13,22 +12,22 @@ class SocialRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Social'),
       ),
-      //body: SocialPage(title: "Social"),
+      body: SocialPage(title: "Social"),
     );
   }
 }
-/*
-class InventoryPage extends StatefulWidget {
-  InventoryPage({super.key, required this.title});
+
+class SocialPage extends StatefulWidget {
+  SocialPage({super.key, required this.title});
 
   final String title;
   final FireStorage storage = FireStorage();
 
   @override
-  State<InventoryPage> createState() => _InventoryPageState();
+  State<SocialPage> createState() => _SocialPageState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class _SocialPageState extends State<SocialPage> {
   late Future<List<Map<String, dynamic>>> futureData;
   String id = "";
 
@@ -45,11 +44,11 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    id = ModalRoute.of(context)!.settings.arguments as String;
-    futureData = fetchInventory(id);
+    //id = ModalRoute.of(context)!.settings.arguments as String;
+    futureData = fetchSocial();
   }
 
-  Future<List<Map<String, dynamic>>> fetchInventory(String id) async {
+  Future<List<Map<String, dynamic>>> fetchSocial() async {
     try {
       if (!widget.storage.isInitialized) {
         await widget.storage.initializeDefault();
@@ -57,19 +56,39 @@ class _InventoryPageState extends State<InventoryPage> {
 
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      QuerySnapshot qs = await firestore.collection(id).get();
+      QuerySnapshot qs = await firestore.collection("allusers").get();
       if (qs.docs.isNotEmpty) {
         List<Map<String, dynamic>> data = [];
-        qs.docs.forEach((element) {
-          if (element.id == "usersettings") {
-            return;
-          }
-          data.add(element.data() as Map<String,
-              dynamic>); //this will break the app if any file besides usersettings does not have the same format
+
+        int mostRecentValue = 0;
+        // Get the most recent value
+        if (qs.docs.length > 9) {
           if (kDebugMode) {
-            print(element.data());
+            Map<String, dynamic> mostrecent =
+                qs.docs[10].data() as Map<String, dynamic>;
+            mostRecentValue = mostrecent['value'];
+          } //mostrecent
+        }
+        //read all from most recent to 0
+        for (int i = mostRecentValue; i >= 0; i--) {
+          if (qs.docs[i].id == "mostrecent") {
+            continue;
           }
-        });
+          data.add(qs.docs[i].data() as Map<String, dynamic>);
+          if (kDebugMode) {
+            print(qs.docs[i].data());
+          }
+        }
+        //read all from 9 to most recent
+        for (int i = 9; i > mostRecentValue; i--) {
+          if (qs.docs[i].id == "mostrecent") {
+            continue;
+          }
+          data.add(qs.docs[i].data() as Map<String, dynamic>);
+          if (kDebugMode) {
+            print(qs.docs[i].data());
+          }
+        }
         return data;
       } else {
         await createCollection(id);
@@ -115,4 +134,3 @@ class _InventoryPageState extends State<InventoryPage> {
     );
   }
 }
-*/
