@@ -13,7 +13,9 @@ class InventoryRoute extends StatelessWidget {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Inventory"),
+        backgroundColor: const Color.fromARGB(255, 166, 25, 25),
+        centerTitle: true,
+        title: Text("Inventory"),
       ),
       body: InventoryPage(title: "Inventory"),
     );
