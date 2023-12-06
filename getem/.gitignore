@@ -45,6 +45,7 @@ app.*.map.json
 #map changes
 android/app/src/main/AndroidManifest.xml
 assets/profile.jpg
+assets/icon.png
 # Firebase Credentials
 lib/firebase_options.dart
 android/app/google-services.json

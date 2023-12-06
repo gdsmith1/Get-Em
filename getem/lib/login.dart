@@ -10,7 +10,9 @@ class FirstRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Welcome to Get Em!"),
+        backgroundColor: const Color.fromARGB(255, 166, 25, 25),
+        centerTitle: true,
+        title: Text("Welcome to Get Em!"),
       ),
       body: const LoginPage(title: "Log in"),
     );
