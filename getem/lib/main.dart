@@ -5,12 +5,36 @@ import 'inventory.dart';
 import 'settings.dart';
 import 'social.dart';
 import 'catch.dart';
+import 'webview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_core/firebase_core.dart";
 import 'firebase_options.dart';
 import 'package:flutter/foundation.dart';
 
 void main() {
+  if (kIsWeb) {
+    runApp(MaterialApp(
+      title: 'Get-em routing',
+      initialRoute: '/socialsweb',
+      routes: {
+        '/socialsweb': (context) => const SocialWebRoute(),
+      },
+    ));
+  } else {
+    //mobile
+    runApp(MaterialApp(
+      title: 'Get-em routing',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const FirstRoute(), //login
+        '/catch': (context) => const CatchRoute(),
+        '/game': (context) => const GameRoute(), //game
+        '/inventory': (context) => const InventoryRoute(),
+        '/settings': (context) => const SettingsRoute(),
+        '/socials': (context) => const SocialRoute(),
+      },
+    ));
+  }
   runApp(MaterialApp(
     title: 'Get-em routing',
     initialRoute: '/',
@@ -21,6 +45,7 @@ void main() {
       '/inventory': (context) => const InventoryRoute(),
       '/settings': (context) => const SettingsRoute(),
       '/socials': (context) => const SocialRoute(),
+      '/socialsweb': (context) => const SocialWebRoute(),
     },
   ));
 }

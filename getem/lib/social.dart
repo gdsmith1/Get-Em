@@ -122,7 +122,7 @@ class _SocialPageState extends State<SocialPage> {
                 rows: snapshot.data!
                     .map((data) => DataRow(cells: [
                           DataCell(data["type"] == "Drakeon" //drakeon
-                                  ? Image.asset('assets/animals/wieneroam.webp')
+                                  ? Image.asset('assets/animals/Drakeon.webp')
                                   : data["type"] == "Alliclaw" //alliclaw
                                       ? Image.asset(
                                           'assets/animals/alliclaw.webp')
