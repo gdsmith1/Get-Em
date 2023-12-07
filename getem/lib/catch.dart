@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:getem/main.dart';
-import 'package:getem/login.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'main.dart';
 import 'package:intl/intl.dart';
-
 import 'dart:math';
 
 class Animal {
@@ -43,10 +39,9 @@ class CatchPage extends StatefulWidget {
   State<CatchPage> createState() => _CatchPageState();
 }
 
-// ... (your existing imports)
-
 class _CatchPageState extends State<CatchPage> {
   late Future<Map<String, dynamic>> futureDif; // difficulty integer
+  late Future<Map<String, dynamic>> futureSoc; // mostrecent integer
   String id = "";
   int lives = 3;
   FireStorage? firevar;
@@ -82,6 +77,7 @@ class _CatchPageState extends State<CatchPage> {
     super.didChangeDependencies();
     id = ModalRoute.of(context)!.settings.arguments as String;
     futureDif = fetchDifficulty(id);
+    futureSoc = fetchSocialRecent();
   }
 
   Future<String?> getLocation() async {
@@ -89,7 +85,6 @@ class _CatchPageState extends State<CatchPage> {
         desiredAccuracy: LocationAccuracy.high);
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
-    //print('YOU LIVE IN: ${placemarks[0].locality}');
     String? location = placemarks[0].locality;
     return location;
   }
@@ -121,13 +116,72 @@ class _CatchPageState extends State<CatchPage> {
     return {};
   }
 
-  Future<bool> writeCatch(String type, String? location, String date) async {
+  Future<Map<String, dynamic>> fetchSocialRecent() async {
+    try {
+      if (!widget.storage.isInitialized) {
+        await widget.storage.initializeDefault();
+      }
+
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      DocumentSnapshot ds =
+          await firestore.collection("allusers").doc("mostrecent").get();
+      if (ds.exists && ds.data() != null) {
+        Map<String, dynamic> data = (ds.data() as Map<String, dynamic>);
+        if (kDebugMode) {
+          print("Recent: $data");
+        }
+        return {'value': data["value"]};
+      } else {
+        await createCollection(id);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return {};
+  }
+
+  Future<bool> writeCatch(
+      String type, String? location, String date, int xp) async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-      Random random = Random();
-      int xp = random.nextInt(100);
 
       firestore.collection(id).doc().set({
+        "type": type,
+        "xp": xp,
+        "Caught in": location,
+        "date": date
+      }).then((value) {
+        if (kDebugMode) {
+          //print("writetoFirebase: $.id");
+        }
+        return true;
+      }).catchError((error) {
+        if (kDebugMode) {
+          print("writetoFirebase: $error");
+        }
+        return false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+    return false;
+  }
+
+  Future<bool> writeCatchSocial(String type, String? location, String date,
+      int xp, Map<String, dynamic> mostrecent) async {
+    if (kDebugMode) {
+      print("updating social value: $mostrecent");
+    }
+    incrementMostRecent(mostrecent['value']);
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      firestore.collection("allusers").doc(mostrecent.toString()).set({
         "type": type,
         "xp": xp,
         "Caught in": location,
@@ -164,39 +218,59 @@ class _CatchPageState extends State<CatchPage> {
           random.nextInt(21); // Generate a random number between 0 and 20
 
       int result = randomNumber + (playerDifficulty);
-      print(result);
+      if (kDebugMode) {
+        print("Random number: $randomNumber");
+        print("Player difficulty: $playerDifficulty");
+      }
 
       if (result > 15) {
-        // print("You didn't catch it! Try again.");
-        //print(DateTime.now());
+        //You didn't catch it!
         // Remove a red dot (life)
         catchResult = "You didn't catch it! Try again.";
         lives--;
 
         // Update the UI
-        //setState(() {});
+        setState(() {});
       } else {
-        //print("You caught it!");
-
+        //You caught it!
         catchResult = "You caught the ${currentAnimal.type}!";
         String? location = await getLocation();
         String date = getDate();
-        //print(date);
-        //print(location);
+        if (kDebugMode) {
+          print(date);
+          print(location);
+        }
         didcatch = true;
         lives = 0;
 
-        writeCatch(currentAnimal.type, location, date); ///////////
-        //setState(() {});
+        Map<String, dynamic> socialData = await fetchSocialRecent();
+        if (kDebugMode) {
+          print("Value: ${socialData['value']}");
+        }
+        Random random = Random();
+        int xp = random.nextInt(100);
+        if (kDebugMode) {
+          print("Writing to Inventory...");
+        }
+        writeCatch(currentAnimal.type, location, date, xp);
+        if (kDebugMode) {
+          print("Writing to Social...");
+        }
+        writeCatchSocial(currentAnimal.type, location, date, xp, socialData);
+        setState(() {});
       }
     } else if (lives == 0 && didcatch == false) {
       catchResult = "Game over! You've run out of lives.";
       setState(() {});
-      print("Game over! You've run out of lives.");
+      if (kDebugMode) {
+        print("Game over! You've run out of lives.");
+      }
     } else if (lives == 0 && didcatch == true) {
       catchResult = "You caught the ${currentAnimal.type}!";
       setState(() {});
-      print("Game over! You've already won.");
+      if (kDebugMode) {
+        print("You already caught the ${currentAnimal.type}!");
+      }
     }
 
     setState(() {});
@@ -205,9 +279,6 @@ class _CatchPageState extends State<CatchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Catch'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,17 +286,19 @@ class _CatchPageState extends State<CatchPage> {
             Expanded(
               child: Container(),
             ),
-            SizedBox(height: 9), // Move content up by 7 pixels
+            const SizedBox(height: 9), // Move content up by 7 pixels
             Column(
               children: [
                 Text(
                   catchResult, // Display catch result
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Text(
-                  "Pokemon: ${currentAnimal.type}",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  "Creature: ${currentAnimal.type}",
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 // Removed SizedBox to move the text closer to the image
 
@@ -236,7 +309,7 @@ class _CatchPageState extends State<CatchPage> {
                 ),
               ],
             ),
-            SizedBox(height: 9), // Move content up by 7 pixels
+            const SizedBox(height: 9), // Move content up by 7 pixels
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -244,15 +317,15 @@ class _CatchPageState extends State<CatchPage> {
                 (index) => Container(
                   width: 25,
                   height: 35,
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
+                  margin: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.red,
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 9), // Move content up by 7 pixels
+            const SizedBox(height: 9), // Move content up by 7 pixels
             ElevatedButton(
               onPressed: () async {
                 Map<String, dynamic> difficultyData = await fetchDifficulty(id);
@@ -260,11 +333,11 @@ class _CatchPageState extends State<CatchPage> {
                 tryToCatch(playerDifficulty, currentAnimal);
               },
               style: ElevatedButton.styleFrom(
-                shape: CircleBorder(),
-                primary: Colors.red,
-                padding: EdgeInsets.all(20),
+                shape: const CircleBorder(),
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.all(20),
               ),
-              child: Text(
+              child: const Text(
                 'Catch!',
                 style: TextStyle(fontSize: 18),
               ),
@@ -273,5 +346,19 @@ class _CatchPageState extends State<CatchPage> {
         ),
       ),
     );
+  }
+}
+
+void incrementMostRecent(int currentValue) {
+  if (currentValue >= 0 && currentValue < 9) {
+    FirebaseFirestore.instance
+        .collection("allusers")
+        .doc("mostrecent")
+        .update({'value': FieldValue.increment(1)});
+  } else if (currentValue == 9) {
+    FirebaseFirestore.instance
+        .collection("allusers")
+        .doc("mostrecent")
+        .update({'value': 0});
   }
 }

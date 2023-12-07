@@ -12,7 +12,7 @@ class FirstRoute extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 166, 25, 25),
         centerTitle: true,
-        title: Text("Welcome to Get Em!"),
+        title: const Text("Welcome to Get Em!"),
       ),
       body: const LoginPage(title: "Log in"),
     );

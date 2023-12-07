@@ -17,7 +17,7 @@ class GameRoute extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 166, 25, 25),
         centerTitle: true,
-        title: Text("Get Em!"),
+        title: const Text("Get Em!"),
       ),
       body: GamePage(title: "Get Em!"),
     );
@@ -164,7 +164,7 @@ class _GamePageState extends State<GamePage> {
             Marker(
               markerId: MarkerId('marker_$i'),
               position: randomLocation,
-              infoWindow: InfoWindow(title: 'Pokemon $i'),
+              infoWindow: InfoWindow(title: 'Creature $i'),
               icon: customMarkerImage, // Set the custom marker icon
             ),
           );
@@ -177,8 +177,8 @@ class _GamePageState extends State<GamePage> {
   void _loadCustomMarker() async {
     final BitmapDescriptor customMarkerImage =
         await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(size: Size(1, 1)), // Set the image size
-      'assets/icon.png', // Replace this with your image path
+      const ImageConfiguration(size: Size(1, 1)), // Set the image size
+      'assets/icon.png',
     );
 
     setState(() {
@@ -248,10 +248,6 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  bool _showActionButton() {
-    return _markers.isNotEmpty;
-  }
-
   Widget _buildActionButton() {
     Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
     String id = arguments['id'];
@@ -264,7 +260,7 @@ class _GamePageState extends State<GamePage> {
         },
         backgroundColor: const Color.fromARGB(
             255, 118, 22, 15), // Set the background color to maroon
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
