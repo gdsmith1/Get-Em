@@ -67,12 +67,12 @@ class _SocialPageState extends State<SocialPage> {
         if (qs.docs.length > 9) {
           if (kDebugMode) {
             Map<String, dynamic> mostrecent =
-                qs.docs[10].data() as Map<String, dynamic>;
+                qs.docs[0].data() as Map<String, dynamic>;
             mostRecentValue = mostrecent['value'];
           } //mostrecent
         }
-        //read all from most recent to 0
-        for (int i = mostRecentValue; i >= 0; i--) {
+        //read all from most recent to 1
+        for (int i = mostRecentValue; i >= 1; i--) {
           if (qs.docs[i].id == "mostrecent") {
             continue;
           }
@@ -82,7 +82,7 @@ class _SocialPageState extends State<SocialPage> {
           }
         }
         //read all from 9 to most recent
-        for (int i = 9; i > mostRecentValue; i--) {
+        for (int i = 10; i > mostRecentValue; i--) {
           if (qs.docs[i].id == "mostrecent") {
             continue;
           }
@@ -114,15 +114,60 @@ class _SocialPageState extends State<SocialPage> {
               scrollDirection: Axis.vertical,
               child: DataTable(
                 columns: const [
-                  DataColumn(label: Text("Type")),
-                  DataColumn(label: Text("Weight")),
-                  DataColumn(label: Text("Height")),
+                  DataColumn(label: Text("Type:")),
+                  DataColumn(label: Text("XP:")),
+                  DataColumn(label: Text("Location:")),
+                  DataColumn(label: Text("Date:")),
                 ],
                 rows: snapshot.data!
                     .map((data) => DataRow(cells: [
-                          DataCell(Text(data["type"])),
-                          DataCell(Text(data["weight"].toString())),
-                          DataCell(Text(data["height"].toString())),
+                          DataCell(data["type"] == "Drakeon" //drakeon
+                                  ? Image.asset('assets/animals/Drakeon.webp')
+                                  : data["type"] == "Alliclaw" //alliclaw
+                                      ? Image.asset(
+                                          'assets/animals/alliclaw.webp')
+                                      : data["type"] == "Aquapanda" //aquapanda
+                                          ? Image.asset(
+                                              'assets/animals/Aquapanda.webp')
+                                          : data["type"] ==
+                                                  "Flananana" //flananana
+                                              ? Image.asset(
+                                                  'assets/animals/flananana.webp')
+                                              : data["type"] ==
+                                                      "Galeodon" //galeodon
+                                                  ? Image.asset(
+                                                      'assets/animals/galeodon.webp')
+                                                  : data["type"] ==
+                                                          "Insectiant" //insectiant
+                                                      ? Image.asset(
+                                                          'assets/animals/insectiant.webp')
+                                                      : data["type"] ==
+                                                              "Moownicorn" //moownicorn
+                                                          ? Image.asset(
+                                                              'assets/animals/moownicorn.webp')
+                                                          : data["type"] ==
+                                                                  "Roaragon" //roaragon
+                                                              ? Image.asset(
+                                                                  'assets/animals/roaragon.webp')
+                                                              : data["type"] ==
+                                                                      "Tyranomight" //tyranomight
+                                                                  ? Image.asset(
+                                                                      'assets/animals/tyranomight.webp')
+                                                                  : data["type"] ==
+                                                                          "Samuronic" //samuronic
+                                                                      ? Image.asset(
+                                                                          'assets/animals/samuronic.webp')
+                                                                      : data["type"] ==
+                                                                              "Venomorph" //venomorph
+                                                                          ? Image.asset(
+                                                                              'assets/animals/venomorph.webp')
+                                                                          : data["type"] == "Wieneroam" //wieneroam
+                                                                              ? Image.asset('assets/animals/wieneroam.webp')
+                                                                              : Image.asset('assets/profile.png') //default
+                              ),
+                          DataCell(Text(data["xp"].toString())),
+                          DataCell(Text(data["Caught in"].toString())),
+                          DataCell(Text(data["date"].toString())),
                         ]))
                     .toList(),
               ),
@@ -130,6 +175,7 @@ class _SocialPageState extends State<SocialPage> {
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
+
           return const CircularProgressIndicator();
         },
       ),

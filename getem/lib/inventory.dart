@@ -15,7 +15,7 @@ class InventoryRoute extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 166, 25, 25),
         centerTitle: true,
-        title: Text("Inventory"),
+        title: const Text("Inventory"),
       ),
       body: InventoryPage(title: "Inventory"),
     );
@@ -97,15 +97,60 @@ class _InventoryPageState extends State<InventoryPage> {
               scrollDirection: Axis.vertical,
               child: DataTable(
                 columns: const [
-                  DataColumn(label: Text("Type")),
-                  DataColumn(label: Text("Weight")),
-                  DataColumn(label: Text("Height")),
+                  DataColumn(label: Text("Type:")),
+                  DataColumn(label: Text("XP:")),
+                  DataColumn(label: Text("Location:")),
+                  DataColumn(label: Text("Date:")),
                 ],
                 rows: snapshot.data!
                     .map((data) => DataRow(cells: [
-                          DataCell(Text(data["type"])),
-                          DataCell(Text(data["weight"].toString())),
-                          DataCell(Text(data["height"].toString())),
+                          DataCell(data["type"] == "Drakeon" //drakeon
+                                  ? Image.asset('assets/animals/Drakeon.webp')
+                                  : data["type"] == "Alliclaw" //alliclaw
+                                      ? Image.asset(
+                                          'assets/animals/alliclaw.webp')
+                                      : data["type"] == "Aquapanda" //aquapanda
+                                          ? Image.asset(
+                                              'assets/animals/Aquapanda.webp')
+                                          : data["type"] ==
+                                                  "Flananana" //flananana
+                                              ? Image.asset(
+                                                  'assets/animals/flananana.webp')
+                                              : data["type"] ==
+                                                      "Galeodon" //galeodon
+                                                  ? Image.asset(
+                                                      'assets/animals/galeodon.webp')
+                                                  : data["type"] ==
+                                                          "Insectiant" //insectiant
+                                                      ? Image.asset(
+                                                          'assets/animals/insectiant.webp')
+                                                      : data["type"] ==
+                                                              "Moownicorn" //moownicorn
+                                                          ? Image.asset(
+                                                              'assets/animals/moownicorn.webp')
+                                                          : data["type"] ==
+                                                                  "Roaragon" //roaragon
+                                                              ? Image.asset(
+                                                                  'assets/animals/roaragon.webp')
+                                                              : data["type"] ==
+                                                                      "Tyranomight" //tyranomight
+                                                                  ? Image.asset(
+                                                                      'assets/animals/tyranomight.webp')
+                                                                  : data["type"] ==
+                                                                          "Samuronic" //samuronic
+                                                                      ? Image.asset(
+                                                                          'assets/animals/samuronic.webp')
+                                                                      : data["type"] ==
+                                                                              "Venomorph" //venomorph
+                                                                          ? Image.asset(
+                                                                              'assets/animals/venomorph.webp')
+                                                                          : data["type"] == "Wieneroam" //wieneroam
+                                                                              ? Image.asset('assets/animals/wieneroam.webp')
+                                                                              : Image.asset('assets/profile.png') //default
+                              ),
+                          DataCell(Text(data["xp"].toString())),
+                          DataCell(Text(data["Caught in"].toString())),
+                          DataCell(Text(data["date"].toString())),
                         ]))
                     .toList(),
               ),
