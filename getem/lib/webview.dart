@@ -64,7 +64,7 @@ class _SocialPageState extends State<SocialPage> {
 
         int mostRecentValue = 0;
         // Get the most recent value
-        if (qs.docs.length > 9) {
+        if (qs.docs.length > 10) {
           if (kDebugMode) {
             Map<String, dynamic> mostrecent =
                 qs.docs[0].data() as Map<String, dynamic>;
@@ -72,7 +72,7 @@ class _SocialPageState extends State<SocialPage> {
           } //mostrecent
         }
         //read all from most recent to 1
-        for (int i = mostRecentValue; i >= 1; i--) {
+        for (int i = mostRecentValue + 1; i >= 1; i--) {
           if (qs.docs[i].id == "mostrecent") {
             continue;
           }
@@ -82,7 +82,7 @@ class _SocialPageState extends State<SocialPage> {
           }
         }
         //read all from 9 to most recent
-        for (int i = 10; i > mostRecentValue; i--) {
+        for (int i = 10; i > mostRecentValue + 1; i--) {
           if (qs.docs[i].id == "mostrecent") {
             continue;
           }
@@ -105,7 +105,6 @@ class _SocialPageState extends State<SocialPage> {
 
   @override
   Widget build(BuildContext context) {
-    int index = 1;
     return Scaffold(
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: futureData,
