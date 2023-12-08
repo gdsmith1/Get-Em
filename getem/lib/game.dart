@@ -67,7 +67,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _startTimer() {
-    const duration = Duration(seconds: 30);
+    const duration = Duration(seconds: 60);
     _timer = Timer.periodic(duration, (timer) {
       _removeAllMarkers();
       _addRandomMarkers();
@@ -144,7 +144,7 @@ class _GamePageState extends State<GamePage> {
   void _addRandomMarkers() {
     if (_currentLocation != null && _customMarkerCompleter != null) {
       final int numberOfMarkers = 1;
-      final double quarterRadius = 0.0015; // Modify this radius as needed
+      final double quarterRadius = 0.002; // Modify this radius as needed
 
       Random random = Random();
       _customMarkerCompleter!.future.then((customMarkerImage) {
