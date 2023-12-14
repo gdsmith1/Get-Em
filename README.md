@@ -3,7 +3,7 @@
 **Video Demo**
 
 
-[![demo](https://github.com/gdsmith1/Get-Em/blob/video-submission/projectdescription/images/demothumbnail.jpg)](https://github.com/gdsmith1/Get-Em/blob/video-submission/projectdescription/videos/demo.mp4)
+[!demo](https://github.com/gdsmith1/Get-Em/blob/video-submission/projectdescription/videos/demo.mp4)
 
 
 <!-- Output copied to clipboard! -->
